@@ -1,0 +1,8 @@
+# - Walls
+? - Unvisted Node
+! - Visited Node
+Classes:
+Node - Type(node or wall), Position, Visited/Not Visited, Weight?
+Grid - Manages Node
+Algorithm
+Visualiser [[#,#,#,#], [#,?,?#], [#,?,?,#], [#,#,#,#]]
