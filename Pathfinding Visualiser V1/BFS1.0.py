@@ -1,6 +1,6 @@
 from classes import Grid, Node
 
-grid = Grid(["####", "#?##", "#??#", "####"])
+grid = Grid(["#?##?#", "#????#", "#??#?#", "#????#"])
 noded_grid = grid.append_nodes()
 
 def identify_node(grid_with_nodes, node_position):
@@ -38,6 +38,7 @@ def bfs(grid_with_nodes):
 
     queue = [start_position]
     visited = {start_position}
+    visit_order = [start_position]
 
     while queue:
         current = queue.pop(0)
@@ -48,19 +49,44 @@ def bfs(grid_with_nodes):
 
         if current == end_position:
             print(visited)
+            print(visit_order)
             break
 
         for neighbour in current_node.get_neighbours():
             neighbour = identify_node(grid_with_nodes, neighbour)
-
             if neighbour is None:
                 continue
 
             if neighbour.type != "wall":
                 if neighbour.position not in visited:
+                    neighbour.parent = current_node
                     neighbour.visit()
                     visited.add(neighbour.position)
+                    visit_order.append(neighbour.position)
                     queue.append(neighbour.position)
+
+    shortest_path = [start_position]
+    shortest_path_visited = {start_position}
+    
+    for node_position in visit_order:
+        if node_position not in shortest_path_visited:
+            node = identify_node(grid_with_nodes, node_position)
+            if node.parent.position in shortest_path_visited:
+                if node.parent.child == None:
+                    node.parent.child = node
+                    shortest_path.append(node.position)
+                    shortest_path_visited.add(node.position)
+                
+                else:
+                    continue
+                
+            else:
+                continue
+
+        else:
+            continue
+    
+    print(shortest_path)
 
 
 bfs(noded_grid)

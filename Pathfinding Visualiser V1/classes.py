@@ -40,6 +40,7 @@ class Node:
         self.position = position
         self.visited = visited
         self.parent = None
+        self.child = None
 
     def get_neighbours(self):
         x, y = self.position
