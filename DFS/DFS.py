@@ -13,7 +13,7 @@ def identify_node(node_position):
     identified_node = grid.nodes.get(node_position)
     return identified_node
 
-def bfs(grid_with_nodes):
+def dfs(grid_with_nodes):
     grid.visualise_grid()
     for row in grid_with_nodes:
         for column in row:
@@ -39,20 +39,19 @@ def bfs(grid_with_nodes):
         except ValueError:
             pass
 
-    queue = [start_position]
+    stack = [start_position]
     visited = {start_position}
     visit_order = [start_position]
 
-    while queue:
-        current = queue.pop(0)
+    while stack:
+        current = stack.pop()
         current_node = identify_node(current)
         current_node.visit()
         grid.visualise_grid()
         print()
 
-
-
         if current == end_position:
+            
             path = []
 
             node = current_node
@@ -70,20 +69,22 @@ def bfs(grid_with_nodes):
             grid.visualise_grid()
 
             print(f"Order visited is: {visit_order}")
-            print(f"Shortest_path is: {path}")
+            print(f"Path is: {path}")
+           
             break
+            
 
         for neighbour in current_node.get_neighbours():
             neighbour = identify_node(neighbour)
             if neighbour is None:
                 continue
 
-            if neighbour.type != "wall":
+            elif neighbour.type != "wall":
                 if neighbour.position not in visited:
                     neighbour.parent = current_node
                     neighbour.visit()
                     visited.add(neighbour.position)
                     visit_order.append(neighbour.position)
-                    queue.append(neighbour.position)
+                    stack.append(neighbour.position)
 
-bfs(noded_grid)
+dfs(noded_grid)
