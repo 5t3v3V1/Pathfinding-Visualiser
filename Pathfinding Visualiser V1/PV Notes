@@ -6,3 +6,5 @@ Node - Type(node or wall), Position, Visited/Not Visited, Weight?
 Grid - Manages Node
 Algorithm
 Visualiser [[#,#,#,#], [#,?,?#], [#,?,?,#], [#,#,#,#]]
+
+(start_position[0] + 1, start_position[1]) or (start_position[0] + 1, start_position[1] + 1) or (start_position[0], start_position[1] + 1) or (start_position[0] - 1, start_position[1] - 1) or (start_position[0] - 1, start_position[1]) or (start_position[0], start_position[1] - 1) or (start_position[0] + 1, start_position[1] - 1) or (start_position[0] - 1, start_position[1] + 1)

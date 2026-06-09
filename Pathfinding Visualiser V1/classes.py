@@ -6,10 +6,12 @@ class Grid:
     def visualise_grid(self):
         for row in self.layout:
             for node in row:
-                if node.type == "node":
-                    print(node.position, end = "")
+                if node.visited == True or node.type == "visited_node":
+                    print("!", end = "")
                 elif node.type == "wall":
-                    print(node.position, end = "")
+                    print("#", end = "")
+                elif node.visited == False:
+                    print("?", end = "")
             print()
 
     def append_nodes(self):
@@ -38,4 +40,18 @@ class Node:
         self.position = position
         self.visited = visited
         self.parent = None
+
+    def get_neighbours(self):
+        x, y = self.position
+        return [(x + 1, y),
+                (x, y + 1),
+                (x - 1, y),
+                (x, y - 1),
+                ]
+    
+    def visit(self):
+        self.visited = True
+        self.type = "visited_node"
+
+
 
