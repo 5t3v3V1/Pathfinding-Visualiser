@@ -14,7 +14,7 @@ def identify_node(node_position):
     identified_node = grid.nodes.get(node_position)
     return identified_node
 
-def dijkstra(grid_with_nodes):
+def astar(grid_with_nodes):
     grid.visualise_grid()
     for row in grid_with_nodes:
         for column in row:
@@ -45,9 +45,10 @@ def dijkstra(grid_with_nodes):
     node_costs_global = {}
     start_node = identify_node(start_position)
     start_node.cost = 0
+    start_node.total_cost = 0
     for row in grid_with_nodes:
         for column in row:
-            node_costs_global[column.position] = column.cost
+            node_costs_global[column.position] = column.total_cost
             unvisited.add(column.position)
 
     while unvisited:
@@ -93,17 +94,18 @@ def dijkstra(grid_with_nodes):
                 continue
                 
             new_cost = current_node.cost + neighbour.weight
+            neighbour.cost_to_end = abs(neighbour.position[0] - end_position[0]) + abs(neighbour.position[1] - end_position[1])
+            neighbour.total_cost = neighbour.cost_to_end + new_cost
 
             if neighbour.type != "wall":
                 if new_cost < neighbour.cost:
                     neighbour.parent = current_node
-                    neighbour.visit()
                     neighbour.cost = new_cost
-                    node_costs[neighbour.position] = neighbour.cost
-                    node_costs_global[neighbour.position] = neighbour.cost
+                    node_costs[neighbour.position] = neighbour.total_cost
+                    node_costs_global[neighbour.position] = neighbour.total_cost
 
         unvisited.discard(current)
         visited.add(current)
                     
 
-dijkstra(noded_grid)
+astar(noded_grid)
