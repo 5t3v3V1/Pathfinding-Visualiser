@@ -1,8 +1,25 @@
 from classes import Grid, Node
+import time
+import random
 
 def identify_node(grid, node_position):
     identified_node = grid.nodes.get(node_position)
     return identified_node
+
+def maze_generator():
+    width = int(input("Width: "))
+    height = int(input("Height: "))
+
+    possible_nodes = [".", "?", "~", "^"]
+    grid = []
+
+    for h in range(height):
+        grid.append("")
+        for w in range(width):
+            node = random.choice(possible_nodes)
+            grid[h] += node
+
+    return grid
 
 def bfs(grid):
     grid.visualise_grid()
@@ -37,6 +54,7 @@ def bfs(grid):
     nodes_visited = 0
 
     while queue:
+        time.sleep(0.1)
         current = queue.pop(0)
         current_node = identify_node(grid, current)
         current_node.visit()
@@ -58,10 +76,10 @@ def bfs(grid):
             path.reverse()
 
             for node_position in path:
+                time.sleep(0.1)
                 identified_node = identify_node(grid, node_position)
                 identified_node.pathed()
-
-            grid.visualise_grid()
+                grid.visualise_grid()   
 
             print(f"Order visited is: {visit_order}")
             print(f"Shortest_path is: {path}")
@@ -115,6 +133,7 @@ def dfs(grid):
     nodes_visited = 0
 
     while stack:
+        time.sleep(0.1)
         current = stack.pop()
         current_node = identify_node(grid, current)
         current_node.visit()
@@ -135,10 +154,10 @@ def dfs(grid):
             path.reverse()
 
             for node_position in path:
+                time.sleep(0.1)
                 identified_node = identify_node(grid, node_position)
                 identified_node.pathed()
-
-            grid.visualise_grid()
+                grid.visualise_grid()   
 
             print(f"Order visited is: {visit_order}")
             print(f"Path is: {path}")
@@ -199,6 +218,7 @@ def dijkstra(grid):
             unvisited.add(column.position)
 
     while unvisited:
+        time.sleep(0.1)
         node_costs = node_costs_global.copy()
 
         for node in list(node_costs.items()):
@@ -225,11 +245,12 @@ def dijkstra(grid):
             node = current_node
 
             while node is not None:
+                time.sleep(0.1)
                 path.append(node.position)
                 node.pathed()
                 node = node.parent
-    
-            grid.visualise_grid()                
+                grid.visualise_grid()   
+                 
             print()
             print(node_costs_global)
             path.reverse()
@@ -295,6 +316,7 @@ def astar(grid):
             unvisited.add(column.position)
 
     while unvisited:
+        time.sleep(0.1)
         node_costs = node_costs_global.copy()
 
         for node in list(node_costs.items()):
@@ -321,11 +343,12 @@ def astar(grid):
             node = current_node
 
             while node is not None:
+                time.sleep(0.1)
                 path.append(node.position)
                 node.pathed()
                 node = node.parent
-    
-            grid.visualise_grid()                
+                grid.visualise_grid()   
+                 
             print()
             print(node_costs_global)
             path.reverse()
@@ -354,13 +377,7 @@ def astar(grid):
 
 def run():
     while True:
-        grid = Grid([
-            "????????",
-            "????????",
-            "????????",
-            "????????",
-            "????????"
-        ])
+        grid = Grid(maze_generator())
         grid.append_nodes()
         grid.visualise_grid()
         print("1. BFS")
