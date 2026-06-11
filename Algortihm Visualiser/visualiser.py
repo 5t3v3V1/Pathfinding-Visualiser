@@ -1,34 +1,14 @@
 from classes import Grid, Node
 import time
 import random
+from collections import deque
+import heapq
 
 def identify_node(grid, node_position):
     identified_node = grid.nodes.get(node_position)
     return identified_node
 
-def maze_generator():
-    width = int(input("Width: "))
-    height = int(input("Height: "))
-
-    possible_nodes = [".", "?", "~", "^"]
-    grid = []
-
-    for h in range(height):
-        grid.append("")
-        for w in range(width):
-            node = random.choice(possible_nodes)
-            grid[h] += node
-
-    return grid
-
-def bfs(grid):
-    grid.visualise_grid()
-    grid_with_nodes = grid.append_nodes()
-    for row in grid_with_nodes:
-        for column in row:
-            print(column.position, end = "")
-        print()
-    
+def get_start_and_end(grid):
     while True:
         try:
             start_position = tuple(input("Select start position: "))
@@ -41,21 +21,55 @@ def bfs(grid):
             end_position = (p, k)
 
             start_node = identify_node(grid, start_position)
+            end_node = identify_node(grid, end_position)
             if start_node.type == "wall":
                 print("Wall selected as start node, please reselect")
+
+            elif end_node.type == "wall":
+                print("Wall selected as start node, please reselect")
+
             else:
                 break
+
         except ValueError:
             pass
 
-    queue = [start_position]
+    return start_position, end_position
+
+def maze_generator():
+    width = int(input("Width: "))
+    height = int(input("Height: "))
+
+    possible_nodes = ["#", ".", "?", "~", "^"]
+    weights = [0.2, 0.3, 0.25, 0.2, 0.15]
+    grid = []
+
+    for h in range(height):
+        grid.append("")
+        for w in range(width):
+            node = random.choices(possible_nodes, weights = weights, k = 1)[0]
+            grid[h] += node
+
+    return grid
+
+def bfs(grid):
+    grid.visualise_grid()
+    grid_with_nodes = grid.append_nodes()
+    for row in grid_with_nodes:
+        for column in row:
+            print(column.position, end = "")
+        print()
+    
+    start_position, end_position = get_start_and_end(grid)
+
+    queue = deque([start_position])
     visited = {start_position}
     visit_order = [start_position]
     nodes_visited = 0
 
     while queue:
         time.sleep(0.1)
-        current = queue.pop(0)
+        current = queue.popleft()
         current_node = identify_node(grid, current)
         current_node.visit()
         nodes_visited += 1
@@ -86,18 +100,22 @@ def bfs(grid):
             print(f"Nodes Visited: {nodes_visited}")
             break
 
-        for neighbour in current_node.get_neighbours():
-            neighbour = identify_node(grid, neighbour)
-            if neighbour is None:
-                continue
+        elif current != end_position:
+            for neighbour in current_node.get_neighbours():
+                neighbour = identify_node(grid, neighbour)
+                if neighbour is None:
+                    continue
 
-            if neighbour.type != "wall":
-                if neighbour.position not in visited:
-                    neighbour.parent = current_node
-                    neighbour.visit()
-                    visited.add(neighbour.position)
-                    visit_order.append(neighbour.position)
-                    queue.append(neighbour.position)
+                if neighbour.type != "wall":
+                    if neighbour.position not in visited:
+                        neighbour.parent = current_node
+                        neighbour.visit()
+                        visited.add(neighbour.position)
+                        visit_order.append(neighbour.position)
+                        queue.append(neighbour.position)
+
+        else:
+            print("Unable to reach desired node")
 
 
 def dfs(grid):
@@ -108,26 +126,9 @@ def dfs(grid):
             print(column.position, end = "")
         print()
     
-    while True:
-        try:
-            start_position = tuple(input("Select start position: "))
-            x, y = start_position
-            m, n = int(x), int(y)
-            start_position = (m, n)
-            end_position = tuple(input("Select end position: "))
-            l, o = end_position
-            p, k = int(l), int(o)
-            end_position = (p, k)
+    start_position, end_position = get_start_and_end(grid)
 
-            start_node = identify_node(grid, start_position)
-            if start_node.type == "wall":
-                print("Wall selected as start node, please reselect")
-            else:
-                break
-        except ValueError:
-            pass
-
-    stack = [start_position]
+    stack = deque([start_position])
     visited = {start_position}
     visit_order = [start_position]
     nodes_visited = 0
@@ -164,20 +165,23 @@ def dfs(grid):
             print(f"Nodes Visited: {nodes_visited}")
            
             break
-            
 
-        for neighbour in current_node.get_neighbours():
-            neighbour = identify_node(grid, neighbour)
-            if neighbour is None:
-                continue
+        elif current != end_position:
+            for neighbour in current_node.get_neighbours():
+                neighbour = identify_node(grid, neighbour)
+                if neighbour is None:
+                    continue
 
-            elif neighbour.type != "wall":
-                if neighbour.position not in visited:
-                    neighbour.parent = current_node
-                    neighbour.visit()
-                    visited.add(neighbour.position)
-                    visit_order.append(neighbour.position)
-                    stack.append(neighbour.position)
+                elif neighbour.type != "wall":
+                    if neighbour.position not in visited:
+                        neighbour.parent = current_node
+                        neighbour.visit()
+                        visited.add(neighbour.position)
+                        visit_order.append(neighbour.position)
+                        stack.append(neighbour.position)
+
+        else:
+            print("Unable to reach desired node")
 
 def dijkstra(grid):
     grid.visualise_grid()
@@ -187,24 +191,7 @@ def dijkstra(grid):
             print(column.position, end = "")
         print()
 
-    while True:
-        try:
-            start_position = tuple(input("Select start position: "))
-            x, y = start_position
-            m, n = int(x), int(y)
-            start_position = (m, n)
-            end_position = tuple(input("Select end position: "))
-            l, o = end_position
-            p, k = int(l), int(o)
-            end_position = (p, k)
-
-            start_node = identify_node(grid, start_position)
-            if start_node.type == "wall":
-                print("Wall selected as start node, please reselect")
-            else:
-                break
-        except ValueError:
-            pass
+    start_position, end_position = get_start_and_end(grid)
 
     unvisited = set()
     visited = set()
@@ -225,7 +212,12 @@ def dijkstra(grid):
             if node[0] in visited:
                 node_costs.pop(node[0])
 
-        min_cost = min(node_costs.values())
+        values = []
+        for value in node_costs.values():
+            values.append(value)
+
+        heapq.heapify(values)
+        min_cost = values[0]
 
         current = 0
 
@@ -257,24 +249,28 @@ def dijkstra(grid):
             print(f"Shortest Path: {path}")
             print(f"Nodes Visited: {nodes_visited}")
             break
-
-        for neighbour in current_node.get_neighbours():
-            neighbour = identify_node(grid, neighbour)
-            if neighbour is None:
-                continue
+        
+        elif current != end_position:
+            for neighbour in current_node.get_neighbours():
+                neighbour = identify_node(grid, neighbour)
+                if neighbour is None:
+                    continue
                 
-            new_cost = current_node.cost + neighbour.weight
+                new_cost = current_node.cost + neighbour.weight
 
-            if neighbour.type != "wall":
-                if new_cost < neighbour.cost:
-                    neighbour.parent = current_node
-                    neighbour.visit()
-                    neighbour.cost = new_cost
-                    node_costs[neighbour.position] = neighbour.cost
-                    node_costs_global[neighbour.position] = neighbour.cost
+                if neighbour.type != "wall":
+                    if new_cost < neighbour.cost:
+                        neighbour.parent = current_node
+                        neighbour.visit()
+                        neighbour.cost = new_cost
+                        node_costs[neighbour.position] = neighbour.cost
+                        node_costs_global[neighbour.position] = neighbour.cost
 
-        unvisited.discard(current)
-        visited.add(current)
+            unvisited.discard(current)
+            visited.add(current)
+
+        else:
+            print("Unable to reach desired node")
 
 def astar(grid):
     grid.visualise_grid()
@@ -284,24 +280,7 @@ def astar(grid):
             print(column.position, end = "")
         print()
 
-    while True:
-        try:
-            start_position = tuple(input("Select start position: "))
-            x, y = start_position
-            m, n = int(x), int(y)
-            start_position = (m, n)
-            end_position = tuple(input("Select end position: "))
-            l, o = end_position
-            p, k = int(l), int(o)
-            end_position = (p, k)
-
-            start_node = identify_node(grid, start_position)
-            if start_node.type == "wall":
-                print("Wall selected as start node, please reselect")
-            else:
-                break
-        except ValueError:
-            pass
+    start_position, end_position = get_start_and_end(grid)
 
     unvisited = set()
     visited = set()
@@ -323,7 +302,12 @@ def astar(grid):
             if node[0] in visited:
                 node_costs.pop(node[0])
 
-        min_cost = min(node_costs.values())
+        values = []
+        for value in node_costs.values():
+            values.append(value)
+
+        heapq.heapify(values)
+        min_cost = values[0]
 
         current = 0
 
@@ -355,29 +339,35 @@ def astar(grid):
             print(f"Shortest Path: {path}")
             print(f"Nodes Visited: {nodes_visited}")
             break
-
-        for neighbour in current_node.get_neighbours():
-            neighbour = identify_node(grid, neighbour)
-            if neighbour is None:
-                continue
+        
+        elif current != end_position:
+            for neighbour in current_node.get_neighbours():
+                neighbour = identify_node(grid, neighbour)
+                if neighbour is None:
+                    continue
                 
-            new_cost = current_node.cost + neighbour.weight
-            neighbour.cost_to_end = abs(neighbour.position[0] - end_position[0]) + abs(neighbour.position[1] - end_position[1])
-            neighbour.total_cost = neighbour.cost_to_end + new_cost
+                new_cost = current_node.cost + neighbour.weight
+                neighbour.cost_to_end = abs(neighbour.position[0] - end_position[0]) + abs(neighbour.position[1] - end_position[1])
+                neighbour.total_cost = neighbour.cost_to_end + new_cost
 
-            if neighbour.type != "wall":
-                if new_cost < neighbour.cost:
-                    neighbour.parent = current_node
-                    neighbour.cost = new_cost
-                    node_costs[neighbour.position] = neighbour.total_cost
-                    node_costs_global[neighbour.position] = neighbour.total_cost
+                if neighbour.type != "wall":
+                    if new_cost < neighbour.cost:
+                        neighbour.parent = current_node
+                        neighbour.cost = new_cost
+                        node_costs[neighbour.position] = neighbour.total_cost
+                        node_costs_global[neighbour.position] = neighbour.total_cost
 
-        unvisited.discard(current)
-        visited.add(current)
+            unvisited.discard(current)
+            visited.add(current)
+
+        else:
+            print("Unable to reach desired node")
 
 def run():
+    grid = Grid(maze_generator())
+
     while True:
-        grid = Grid(maze_generator())
+        grid.reset()
         grid.append_nodes()
         grid.visualise_grid()
         print("1. BFS")

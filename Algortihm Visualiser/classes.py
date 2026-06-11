@@ -1,8 +1,9 @@
 
 class Grid:
     def __init__(self, layout):
-        self.layout = layout
+        self.layout = layout.copy()
         self.nodes = {}
+        self.reset_layout = layout.copy()
     
     def visualise_grid(self):
         for row in self.layout:
@@ -53,12 +54,12 @@ class Grid:
                     row_items[index] = node
                     self.layout[row_index] = row_items
 
-        return self.layout
+        return self.layout         
     
-    def run(self):
-        self.append_nodes()
-        self.visualise_grid()
-            
+    def reset(self):
+        self.layout = self.reset_layout.copy()
+        self.nodes = {}
+
 
 class Node:
     def __init__(self, type, position, weight, visited):
